@@ -19,7 +19,6 @@ const messageContent  = document.getElementById("messageContent");
 const quoteEl         = document.getElementById("quote");
 const copyBtn         = document.getElementById("copyBtn");
 const downloadBtn     = document.getElementById("downloadBtn");
-const shareBtn        = document.getElementById("shareBtn");
 const linkBtn         = document.getElementById("linkBtn");
 const resetBtn        = document.getElementById("resetBtn");
 const toastEl         = document.getElementById("toast");
@@ -28,7 +27,6 @@ const stickerStage    = document.getElementById("stickerStage");
 const stickerBackBtn  = document.getElementById("stickerBackBtn");
 const stickerResetBtn = document.getElementById("stickerResetBtn");
 const stickerDownloadBtn = document.getElementById("stickerDownloadBtn");
-const stickerShareBtn = document.getElementById("stickerShareBtn");
 const stickerLinkBtn  = document.getElementById("stickerLinkBtn");
 const cutoutRow1      = document.getElementById("cutoutRow1");
 const cutoutRow2      = document.getElementById("cutoutRow2");
@@ -703,7 +701,6 @@ async function downloadStickerCard() {
 form.addEventListener("submit", handleGenerate);
 resetBtn.addEventListener("click", resetCard);
 copyBtn.addEventListener("click", copyMessage);
-shareBtn.addEventListener("click", shareCard);
 downloadBtn.addEventListener("click", downloadCard);
 linkBtn.addEventListener("click", copyShareLink);
 
@@ -714,7 +711,6 @@ stickerResetBtn.addEventListener("click", () => {
   resetCard();
 });
 stickerDownloadBtn.addEventListener("click", downloadStickerCard);
-stickerShareBtn.addEventListener("click", shareCard);
 stickerLinkBtn.addEventListener("click", copyShareLink);
 
 initFloatingAmbient();
