@@ -157,6 +157,8 @@ function tryAutoRevealFromLink() {
   const from = (params.get("from") || "").trim();
   if (!to || !from) return false;
 
+  window.scrollTo(0, 0);
+
   yourNameInput.value = from;
   friendNameInput.value = to;
   state.yourName = from;
@@ -164,6 +166,13 @@ function tryAutoRevealFromLink() {
 
   renderMessage(to, from);
   card.classList.add("flipped");
+
+  // Some mobile browsers restore an old scroll position after the layout
+  // shifts (flip animation, fonts loading, etc.) — nudge back to top a
+  // couple more times to make sure "Dear <name>," is the first thing seen.
+  requestAnimationFrame(() => window.scrollTo(0, 0));
+  setTimeout(() => window.scrollTo(0, 0), 300);
+  setTimeout(() => window.scrollTo(0, 0), 600);
 
   setTimeout(() => {
     burstConfetti(window.innerWidth / 2, window.innerHeight / 2.4);
