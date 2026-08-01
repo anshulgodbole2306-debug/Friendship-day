@@ -20,6 +20,7 @@ const quoteEl         = document.getElementById("quote");
 const copyBtn         = document.getElementById("copyBtn");
 const downloadBtn     = document.getElementById("downloadBtn");
 const shareBtn        = document.getElementById("shareBtn");
+const linkBtn         = document.getElementById("linkBtn");
 const resetBtn        = document.getElementById("resetBtn");
 const toastEl         = document.getElementById("toast");
 const nextSlideBtn    = document.getElementById("nextSlideBtn");
@@ -28,6 +29,7 @@ const stickerBackBtn  = document.getElementById("stickerBackBtn");
 const stickerResetBtn = document.getElementById("stickerResetBtn");
 const stickerDownloadBtn = document.getElementById("stickerDownloadBtn");
 const stickerShareBtn = document.getElementById("stickerShareBtn");
+const stickerLinkBtn  = document.getElementById("stickerLinkBtn");
 const cutoutRow1      = document.getElementById("cutoutRow1");
 const cutoutRow2      = document.getElementById("cutoutRow2");
 
@@ -108,6 +110,68 @@ function stopNightMode() {
   starsLayer.classList.remove("visible");
   clearInterval(state.memoryTimer);
   starsLayer.querySelectorAll(".memory").forEach((m) => m.remove());
+}
+
+/* =========================================================
+   2b. SHAREABLE SURPRISE LINKS
+   Reads/writes ?to=Friend&from=You so a link can open
+   straight into the reveal, no typing required.
+   ========================================================= */
+function buildShareUrl(friend, you) {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.searchParams.set("to", friend);
+  url.searchParams.set("from", you);
+  return url.toString();
+}
+
+async function copyTextToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (err) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    return true;
+  }
+}
+
+async function copyShareLink() {
+  if (!state.friendName || !state.yourName) return;
+  const link = buildShareUrl(state.friendName, state.yourName);
+  await copyTextToClipboard(link);
+  showToast("Surprise link copied — send it to her! 🔗");
+}
+
+// If the page was opened with ?to=...&from=..., skip the form entirely
+// and reveal the card immediately, as if it had just been generated.
+function tryAutoRevealFromLink() {
+  const params = new URLSearchParams(window.location.search);
+  const to = (params.get("to") || "").trim();
+  const from = (params.get("from") || "").trim();
+  if (!to || !from) return false;
+
+  yourNameInput.value = from;
+  friendNameInput.value = to;
+  state.yourName = from;
+  state.friendName = to;
+
+  renderMessage(to, from);
+  card.classList.add("flipped");
+
+  setTimeout(() => {
+    burstConfetti(window.innerWidth / 2, window.innerHeight / 2.4);
+    burstSparkles();
+    startNightMode();
+  }, 550);
+
+  return true;
 }
 
 /* =========================================================
@@ -632,6 +696,7 @@ resetBtn.addEventListener("click", resetCard);
 copyBtn.addEventListener("click", copyMessage);
 shareBtn.addEventListener("click", shareCard);
 downloadBtn.addEventListener("click", downloadCard);
+linkBtn.addEventListener("click", copyShareLink);
 
 nextSlideBtn.addEventListener("click", showStickerSlide);
 stickerBackBtn.addEventListener("click", hideStickerSlide);
@@ -641,7 +706,9 @@ stickerResetBtn.addEventListener("click", () => {
 });
 stickerDownloadBtn.addEventListener("click", downloadStickerCard);
 stickerShareBtn.addEventListener("click", shareCard);
+stickerLinkBtn.addEventListener("click", copyShareLink);
 
 initFloatingAmbient();
 initStars();
 initStickerSlide();
+tryAutoRevealFromLink();
